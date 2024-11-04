@@ -15,7 +15,11 @@ training_labels_filepath = join(input_path, 'train-labels-idx1-ubyte')
 test_images_filepath = join(input_path, 't10k-images-idx3-ubyte')
 test_labels_filepath = join(input_path, 't10k-labels-idx1-ubyte')
 
-# Function to display images
+# Load given MNIST dataset
+mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
+(x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
+
+# Display loaded images
 def show_images(images, title_texts):
     cols = 5
     rows = int(len(images) / cols) + 1
@@ -31,11 +35,6 @@ def show_images(images, title_texts):
         index += 1
     plt.show()
 
-# Load given MNIST dataset
-mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
-(x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
-
-# Display loaded images
 images_2_show = []
 titles_2_show = []
 for i in range(10):
