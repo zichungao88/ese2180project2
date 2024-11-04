@@ -24,20 +24,25 @@ mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath,
 # DONE
 # pixel intensity: black = 0, 255 = white
 image_quantity = len(x_train) # truncated to 5000 out of 60000
-pixel_dimensions = (28, 28) # 28x28 pixels
+pixel_dimensions = (28, 28) # 28 x 28 pixels
 
 nonzero_intensities = []
-for i in range(600):
+for i in range(1000): # 600 <= x <= 5000
     for j in range(pixel_dimensions[0]):
         for k in range(pixel_dimensions[1]):
             if x_train[i][j][k] != 0 and (j, k) not in nonzero_intensities:
                 nonzero_intensities.append((j, k))
 feature_quantity = len(nonzero_intensities) # number of features used for classification
+# print(feature_quantity) # should not exceed 28 * 28 = 784
 
 
 # 3 TODO: Construct matrix A & vector y, solve the least square, & plot values of entries of theta
+# IN PROGRESS
+def construct_A_y(x_data, y_data, N, M):
+    # A -> N x M = image_quantity x feature_quantity
+    return None
 
-
+construct_A_y(x_train, y_train, image_quantity, feature_quantity)
 
 
 # 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier

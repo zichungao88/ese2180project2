@@ -2,8 +2,6 @@ import numpy as np
 import struct
 from array import array
 from os.path import join
-import random
-import matplotlib.pyplot as plt
 
 
 class mnist_data_loader(object):
