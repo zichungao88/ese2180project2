@@ -8,14 +8,14 @@ import mnist_data_loader # class from mnist_data_loader.py
 
 # 1 TODO: Download & load MNIST training & testing datsets
 # DONE
-# Set file paths
+# set file paths
 input_path = './'
 training_images_filepath = join(input_path, 'train-images-idx3-ubyte')
 training_labels_filepath = join(input_path, 'train-labels-idx1-ubyte')
 test_images_filepath = join(input_path, 't10k-images-idx3-ubyte')
 test_labels_filepath = join(input_path, 't10k-labels-idx1-ubyte')
 
-# Load given MNIST dataset
+# load given MNIST dataset
 mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
 (x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
 
@@ -37,18 +37,32 @@ feature_quantity = len(nonzero_intensities) # number of features used for classi
 
 
 # 3 TODO: Construct matrix A & vector y, solve the least square, & plot values of entries of theta
-# IN PROGRESS
+# DONE
 def construct_A_y(x_data, y_data, features, N, M):
     # A -> N x M = image_quantity x feature_quantity
     A = np.zeros((N, M))
-    feature_functions = [lambda x, j = j: x[j] for j in range(2)]
-    print(feature_functions[0](x_data[0][0]))
+    feature_functions = [lambda x, pixel = pixel: x[pixel[0]][pixel[1]] for pixel in features]
     for i in range(N):
         for j in range(M):
-            A[i, j] = feature_functions[j](x_data[i][0]) # needs scrutiny (entire for loop)
-    return A
+            A[i, j] = feature_functions[j](x_data[i])
+    return A, y_data
 
-A = construct_A_y(x_train, y_train, nonzero_intensities, image_quantity, feature_quantity)
+A, y = construct_A_y(x_train, y_train, nonzero_intensities, image_quantity, feature_quantity)
+
+# solve least squares
+theta = np.linalg.lstsq(A, y, rcond=None)[0]
+
+# map theta to 28 x 28 grid (will be sparse b/c # of features < # of pixels)
+theta_plot = np.zeros(pixel_dimensions)
+for i, (j, k) in enumerate(nonzero_intensities):
+    theta_plot[j, k] = theta[i]
+plt.imshow(theta_plot)
+plt.colorbar(label="Value of θ")
+plt.title("Entries of θ at Different Pixel Coordinates")
+plt.xlabel("x-coordinate")
+plt.ylabel("y-coordinate")
+plt.savefig('theta.png')
+# plt.show()
 
 
 # 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier
