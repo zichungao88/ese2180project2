@@ -38,11 +38,17 @@ feature_quantity = len(nonzero_intensities) # number of features used for classi
 
 # 3 TODO: Construct matrix A & vector y, solve the least square, & plot values of entries of theta
 # IN PROGRESS
-def construct_A_y(x_data, y_data, N, M):
+def construct_A_y(x_data, y_data, features, N, M):
     # A -> N x M = image_quantity x feature_quantity
-    return None
+    A = np.zeros((N, M))
+    feature_functions = [lambda x, j = j: x[j] for j in range(2)]
+    print(feature_functions[0](x_data[0][0]))
+    for i in range(N):
+        for j in range(M):
+            A[i, j] = feature_functions[j](x_data[i][0]) # needs scrutiny (entire for loop)
+    return A
 
-construct_A_y(x_train, y_train, image_quantity, feature_quantity)
+A = construct_A_y(x_train, y_train, nonzero_intensities, image_quantity, feature_quantity)
 
 
 # 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier
