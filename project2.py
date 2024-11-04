@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import mnist_data_loader # class from mnist_data_loader.py
 
 # 1 TODO: Download & load MNIST training & testing datsets
-
+# DONE
 # Set file paths
 input_path = './'
 training_images_filepath = join(input_path, 'train-images-idx3-ubyte')
@@ -19,40 +19,20 @@ test_labels_filepath = join(input_path, 't10k-labels-idx1-ubyte')
 mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
 (x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
 
-# Display loaded images
-def show_images(images, title_texts):
-    cols = 5
-    rows = int(len(images) / cols) + 1
-    plt.figure(figsize = (30, 20))
-    index = 1    
-    for i in zip(images, title_texts):        
-        image = i[0]        
-        title_text = i[1]
-        plt.subplot(rows, cols, index)        
-        plt.imshow(image, cmap = plt.cm.gray)
-        if (title_text != ''):
-            plt.title(title_text, fontsize = 15);        
-        index += 1
-    plt.show()
-
-images_2_show = []
-titles_2_show = []
-for i in range(10):
-    r = random.randint(1, 5000)
-    images_2_show.append(x_train[r])
-    titles_2_show.append('training image [' + str(r) + '] = ' + str(y_train[r]))    
-
-for i in range(5):
-    r = random.randint(1, 5000)
-    images_2_show.append(x_test[r])        
-    titles_2_show.append('test image [' + str(r) + '] = ' + str(y_test[r]))    
-
-# show_images(images_2_show, titles_2_show)
-
 
 # 2 TODO: Identify row & column indices of pixels with nonzero intensities
+# DONE
+# pixel intensity: black = 0, 255 = white
+image_quantity = len(x_train) # truncated to 5000 out of 60000
+pixel_dimensions = (28, 28) # 28x28 pixels
 
-
+nonzero_intensities = []
+for i in range(600):
+    for j in range(pixel_dimensions[0]):
+        for k in range(pixel_dimensions[1]):
+            if x_train[i][j][k] != 0 and (j, k) not in nonzero_intensities:
+                nonzero_intensities.append((j, k))
+feature_quantity = len(nonzero_intensities) # number of features used for classification
 
 
 # 3 TODO: Construct matrix A & vector y, solve the least square, & plot values of entries of theta

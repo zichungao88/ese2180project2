@@ -40,4 +40,10 @@ class mnist_data_loader(object):
     def load_data(self):
         x_train, y_train = self.read_images_labels(self.training_images_filepath, self.training_labels_filepath)
         x_test, y_test = self.read_images_labels(self.test_images_filepath, self.test_labels_filepath)
+        
+        # first 5000 images & labels of training & testing data only
+        x_train = x_train[:5000]
+        x_test = x_test[:5000]
+        y_train = y_train[:5000]
+        y_test = y_test[:5000]
         return (x_train, y_train),(x_test, y_test)
