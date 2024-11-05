@@ -25,14 +25,18 @@ mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath,
 # pixel intensity: black = 0, 255 = white
 image_quantity = len(x_train) # truncated to 5000 out of 60000
 pixel_dimensions = (28, 28) # 28 x 28 pixels
-
 nonzero_intensities = []
-for i in range(1000): # 600 <= x <= 5000
-    for j in range(pixel_dimensions[0]):
-        for k in range(pixel_dimensions[1]):
-            if x_train[i][j][k] != 0 and (j, k) not in nonzero_intensities:
-                nonzero_intensities.append((j, k))
-feature_quantity = len(nonzero_intensities) # number of features used for classification
+
+def calculate_feature(intensities, dimensions):
+    for i in range(1000): # 600 <= x <= 5000
+        for j in range(dimensions[0]):
+            for k in range(dimensions[1]):
+                if x_train[i][j][k] != 0 and (j, k) not in intensities:
+                    intensities.append((j, k))
+    feature_quantity = len(intensities) # number of features used for classification
+    return feature_quantity
+
+feature_quantity = calculate_feature(nonzero_intensities, pixel_dimensions)
 # print(feature_quantity) # should not exceed 28 * 28 = 784
 
 
@@ -66,8 +70,65 @@ plt.savefig('theta.png')
 
 
 # 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier
+# IN PROGRESS (ALMOST DONE)
+# reconstruct A & y (only theta remains unchanged for testing)
+nonzero_intensities_test = []
+feature_quantity_test = calculate_feature(nonzero_intensities_test, pixel_dimensions)
+A1, y1 = construct_A_y(x_test, y_test, nonzero_intensities_test, image_quantity, feature_quantity_test)
 
+# calculate f_tilde(x) i.e. least squares classifier
+def calculate_classifier(A_matrix, theta_vector):
+    least_squares = np.matmul(A_matrix, theta_vector)
+    # print(len(least_squares))
 
+    classifier = []
+    for i in range(image_quantity):
+        if least_squares[i] > 0:
+            classifier.append(1)
+        elif least_squares[i] < 0:
+            classifier.append(-1)
+        else:
+            classifier.append(0)
+    # print(len(classifier))
+
+    return classifier
+
+least_squares_classifier = calculate_classifier(A1, theta)
+
+# compare w/ test data
+def calculate_error(classifier, actual):
+    total_positive = 0
+    total_negative = 0
+    total_error = 0
+    total_false_positive = 0
+    total_false_negative = 0
+    for i in range(image_quantity):
+        if actual[i] == 0: # class 1
+            total_positive += 1
+            if classifier[i] == -1: # false negative
+                total_error += 1
+                total_false_negative += 1
+        else: # class -1
+            total_negative += 1
+            if classifier[i] == 1: # false positive
+                total_error += 1
+                total_false_positive += 1
+    
+    error_rate = total_error / image_quantity
+    false_positive_rate = total_false_positive / total_negative
+    false_negative_rate = total_false_negative / total_positive
+
+    errors = [error_rate, false_positive_rate, false_negative_rate]
+    return errors
+
+error_list = calculate_error(least_squares_classifier, y1)
+error_rate = format(error_list[0], '.0%')
+false_positive_rate = format(error_list[1], '.0%')
+false_negative_rate = format(error_list[2], '.0%')
+print(error_rate)
+print(false_positive_rate)
+print(false_negative_rate)
+# values need scrutiny bruh
 
 
 # 5 TODO: Repeat steps 1-4 w/ only the 1st 100 images
