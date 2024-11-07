@@ -27,8 +27,8 @@ image_quantity = len(x_train) # truncated to 5000 out of 60000
 pixel_dimensions = (28, 28) # 28 x 28 pixels
 nonzero_intensities = []
 
-def calculate_feature(intensities, dimensions):
-    for i in range(1000): # 600 <= x <= 5000
+def calculate_feature(intensities, dimensions, number):
+    for i in range(number): # 600 <= x <= 5000
         for j in range(dimensions[0]):
             for k in range(dimensions[1]):
                 if x_train[i][j][k] != 0 and (j, k) not in intensities:
@@ -36,7 +36,7 @@ def calculate_feature(intensities, dimensions):
     feature_quantity = len(intensities) # number of features used for classification
     return feature_quantity
 
-feature_quantity = calculate_feature(nonzero_intensities, pixel_dimensions)
+feature_quantity = calculate_feature(nonzero_intensities, pixel_dimensions, 1000)
 # print(feature_quantity) # should not exceed 28 * 28 = 784
 
 
@@ -73,7 +73,7 @@ plt.savefig('theta.png')
 # IN PROGRESS (ALMOST DONE)
 # reconstruct A & y (only theta remains unchanged for testing)
 nonzero_intensities_test = []
-feature_quantity_test = calculate_feature(nonzero_intensities_test, pixel_dimensions)
+feature_quantity_test = calculate_feature(nonzero_intensities_test, pixel_dimensions, 1000)
 A1, y1 = construct_A_y(x_test, y_test, nonzero_intensities_test, image_quantity, feature_quantity_test)
 
 # calculate f_tilde(x) i.e. least squares classifier
@@ -94,6 +94,9 @@ def calculate_classifier(A_matrix, theta_vector):
     return classifier
 
 least_squares_classifier = calculate_classifier(A1, theta)
+
+# for i in range(image_quantity):
+#     print((least_squares_classifier[i], y1[i]))
 
 # compare w/ test data
 def calculate_error(classifier, actual):
