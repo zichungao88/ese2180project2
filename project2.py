@@ -123,9 +123,10 @@ error_list = calculate_error(least_squares_classifier, y1, image_quantity)
 error_rate = format(error_list[0], '.0%')
 false_positive_rate = format(error_list[1], '.0%')
 false_negative_rate = format(error_list[2], '.0%')
-print(error_rate)
-print(false_positive_rate)
-print(false_negative_rate)
+print("For 5,000 images:")
+print("Error Rate: " + error_rate)
+print("False Positive Rate: " + false_positive_rate)
+print("False Negative Rate: " + false_negative_rate)
 
 
 # 5 TODO: Repeat steps 1-4 w/ only the 1st 100 images
@@ -160,9 +161,10 @@ error_list100 = calculate_error(least_squares_classifier100, y1001, image_quanti
 error_rate100 = format(error_list100[0], '.0%')
 false_positive_rate100 = format(error_list100[1], '.0%')
 false_negative_rate100 = format(error_list100[2], '.0%')
-print(error_rate100)
-print(false_positive_rate100)
-print(false_negative_rate100)
+print("\nFor 100 images:")
+print("Error Rate: " + error_rate100)
+print("False Positive Rate: " + false_positive_rate100)
+print("False Negative Rate: " + false_negative_rate100)
 
 
 # 6 TODO: Changing the feature set
