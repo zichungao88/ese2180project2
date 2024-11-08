@@ -15,10 +15,14 @@ training_labels_filepath = join(input_path, 'train-labels-idx1-ubyte')
 test_images_filepath = join(input_path, 't10k-images-idx3-ubyte')
 test_labels_filepath = join(input_path, 't10k-labels-idx1-ubyte')
 
-# load given MNIST dataset
+# load given MNIST dataset & truncate to the 1st 5000 images
 mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
 (x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
 
+x_train = x_train[:5000]
+x_test = x_test[:5000]
+y_train = y_train[:5000]
+y_test = y_test[:5000]
 
 # 2 TODO: Identify row & column indices of pixels with nonzero intensities
 # DONE
@@ -27,8 +31,8 @@ image_quantity = len(x_train) # truncated to 5000 out of 60000
 pixel_dimensions = (28, 28) # 28 x 28 pixels
 nonzero_intensities = []
 
-def calculate_feature(intensities, dimensions, number):
-    for i in range(number): # 600 <= x <= 5000
+def calculate_feature(intensities, dimensions, image_number):
+    for i in range(image_number): # 600 <= x <= 5000
         for j in range(dimensions[0]):
             for k in range(dimensions[1]):
                 if x_train[i][j][k] != 0 and (j, k) not in intensities:
@@ -90,13 +94,13 @@ least_squares_classifier = calculate_classifier(A1, theta)
 #     print((least_squares_classifier[i], y1[i]))
 
 # compare w/ test data
-def calculate_error(classifier, actual):
+def calculate_error(classifier, actual, image_number):
     total_positive = 0
     total_negative = 0
     total_error = 0
     total_false_positive = 0
     total_false_negative = 0
-    for i in range(image_quantity):
+    for i in range(image_number):
         if actual[i] == 0: # class 1
             total_positive += 1
             if classifier[i] == -1: # false negative
@@ -108,14 +112,14 @@ def calculate_error(classifier, actual):
                 total_error += 1
                 total_false_positive += 1
     
-    error_rate = total_error / image_quantity
+    error_rate = total_error / image_number
     false_positive_rate = total_false_positive / total_negative
     false_negative_rate = total_false_negative / total_positive
 
     errors = [error_rate, false_positive_rate, false_negative_rate]
     return errors
 
-error_list = calculate_error(least_squares_classifier, y1)
+error_list = calculate_error(least_squares_classifier, y1, image_quantity)
 error_rate = format(error_list[0], '.0%')
 false_positive_rate = format(error_list[1], '.0%')
 false_negative_rate = format(error_list[2], '.0%')
@@ -125,12 +129,44 @@ print(false_negative_rate)
 
 
 # 5 TODO: Repeat steps 1-4 w/ only the 1st 100 images
+# IN PROGRESS (gotta finish # 4 first) (bye)
+x_train100 = x_train[:100]
+x_test100 = x_test[:100]
+y_train100 = y_train[:100]
+y_test100 = y_test[:100]
 
+image_quantity100 = len(x_train100)
+nonzero_intensities100 = []
+feature_quantity100 = calculate_feature(nonzero_intensities100, pixel_dimensions, 100) # caps @ 100
 
+A100, y100 = construct_A_y(x_train100, y_train100, nonzero_intensities100, image_quantity100, feature_quantity100)
+theta100 = np.linalg.lstsq(A100, y100, rcond=None)[0]
+
+theta_plot100 = np.zeros(pixel_dimensions)
+for i, (j, k) in enumerate(nonzero_intensities100):
+    theta_plot100[j, k] = theta100[i]
+plt.figure() # avoid overriding previous figure
+plt.imshow(theta_plot100)
+plt.colorbar(label="Value of θ")
+plt.title("Entries of θ at Different Pixel Coordinates")
+plt.xlabel("x-coordinate")
+plt.ylabel("y-coordinate")
+plt.savefig('theta100.png')
+
+A1001, y1001 = construct_A_y(x_test100, y_test100, nonzero_intensities100, image_quantity100, feature_quantity100)
+least_squares_classifier100 = calculate_classifier(A1001, theta100)
+
+error_list100 = calculate_error(least_squares_classifier100, y1001, image_quantity100)
+error_rate100 = format(error_list100[0], '.0%')
+false_positive_rate100 = format(error_list100[1], '.0%')
+false_negative_rate100 = format(error_list100[2], '.0%')
+print(error_rate100)
+print(false_positive_rate100)
+print(false_negative_rate100)
 
 
 # 6 TODO: Changing the feature set
-
+# CONTINUE NEXT (again, gotta finish # 4 first)
 
 
 
