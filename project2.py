@@ -72,23 +72,14 @@ plt.savefig('theta.png')
 # 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier
 # IN PROGRESS (ALMOST DONE)
 # reconstruct A & y (only theta remains unchanged for testing)
-nonzero_intensities_test = []
-feature_quantity_test = calculate_feature(nonzero_intensities_test, pixel_dimensions, 1000)
-A1, y1 = construct_A_y(x_test, y_test, nonzero_intensities_test, image_quantity, feature_quantity_test)
+A1, y1 = construct_A_y(x_test, y_test, nonzero_intensities, image_quantity, feature_quantity)
 
 # calculate f_tilde(x) i.e. least squares classifier
 def calculate_classifier(A_matrix, theta_vector):
     least_squares = np.matmul(A_matrix, theta_vector)
     # print(len(least_squares))
 
-    classifier = []
-    for i in range(image_quantity):
-        if least_squares[i] > 0:
-            classifier.append(1)
-        elif least_squares[i] < 0:
-            classifier.append(-1)
-        else:
-            classifier.append(0)
+    classifier = np.sign(least_squares)
     # print(len(classifier))
 
     return classifier
@@ -131,7 +122,6 @@ false_negative_rate = format(error_list[2], '.0%')
 print(error_rate)
 print(false_positive_rate)
 print(false_negative_rate)
-# values need scrutiny bruh
 
 
 # 5 TODO: Repeat steps 1-4 w/ only the 1st 100 images
