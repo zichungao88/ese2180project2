@@ -31,6 +31,9 @@ image_quantity = len(x_train) # truncated to 5000 out of 60000
 pixel_dimensions = (28, 28) # 28 x 28 pixels
 nonzero_intensities = []
 
+# REDO BRUH
+# correct approach: loop thru all 5k & increment 28 x 28 pixel entries for nonzero intensities;
+# only keep values ≥ 600 as features
 def calculate_feature(intensities, dimensions, image_number):
     for i in range(image_number): # 600 <= x <= 5000
         for j in range(dimensions[0]):
@@ -169,7 +172,8 @@ print("False Negative Rate: " + false_negative_rate100)
 
 # 6 TODO: Changing the feature set
 # CONTINUE NEXT (again, gotta finish # 4 first)
-
+new_feature_quantity = 5000 # M
+# R = 5000 x 609
 
 
 # 7 TODO: Calculate error rate, false positive, & false negative rate for the new classifier
