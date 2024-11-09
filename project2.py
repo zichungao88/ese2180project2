@@ -29,43 +29,52 @@ y_test = y_test[:5000]
 # pixel intensity: black = 0, 255 = white
 image_quantity = len(x_train) # truncated to 5000 out of 60000
 pixel_dimensions = (28, 28) # 28 x 28 pixels
-nonzero_intensities = []
+nonzero_intensities = np.zeros(pixel_dimensions)
+maximum_intensity = 600
 
 # REDO BRUH
 # correct approach: loop thru all 5k & increment 28 x 28 pixel entries for nonzero intensities;
 # only keep values ≥ 600 as features
-def calculate_feature(intensities, dimensions, image_number):
-    for i in range(image_number): # 600 <= x <= 5000
-        for j in range(dimensions[0]):
-            for k in range(dimensions[1]):
-                if x_train[i][j][k] != 0 and (j, k) not in intensities:
-                    intensities.append((j, k))
-    feature_quantity = len(intensities) # number of features used for classification
-    return feature_quantity
+def calculate_feature(intensities, dimensions, image_number, max_intensity):
+    for i in range(image_number): # 5000
+        for j in range(dimensions[0]): # 28
+            for k in range(dimensions[1]): # 28
+                if x_train[i][j][k] != 0:
+                    intensities[j][k] += 1
 
-feature_quantity = calculate_feature(nonzero_intensities, pixel_dimensions, 1000)
+    feature_quantity = 0
+    feature_functions = []
+    for i in range(dimensions[0]): # 28
+        for j in range(dimensions[1]): # 28
+            if intensities[i][j] >= max_intensity:
+                feature_quantity += 1
+                feature_functions.append((i, j))
+    return feature_quantity, feature_functions
+
+feature_quantity, feature_function = calculate_feature(nonzero_intensities, pixel_dimensions, image_quantity, maximum_intensity)
 # print(feature_quantity) # should not exceed 28 * 28 = 784
+# print(len(feature_function))
 
 
 # 3 TODO: Construct matrix A & vector y, solve the least square, & plot values of entries of theta
 # DONE
-def construct_A_y(x_data, y_data, features, N, M):
+def construct_A_y(x_data, y_data, feature_functions, N, M):
     # A -> N x M = image_quantity x feature_quantity
     A = np.zeros((N, M))
-    feature_functions = [lambda x, pixel = pixel: x[pixel[0]][pixel[1]] for pixel in features]
+
     for i in range(N):
-        for j in range(M):
-            A[i, j] = feature_functions[j](x_data[i])
+        for j, (k, l) in enumerate(feature_functions):
+            A[i, j] = x_data[i][k][l]
     return A, y_data
 
-A, y = construct_A_y(x_train, y_train, nonzero_intensities, image_quantity, feature_quantity)
+A, y = construct_A_y(x_train, y_train, feature_function, image_quantity, feature_quantity)
 
 # solve least squares
 theta = np.linalg.lstsq(A, y, rcond=None)[0]
 
 # map theta to 28 x 28 grid (will be sparse b/c # of features < # of pixels)
 theta_plot = np.zeros(pixel_dimensions)
-for i, (j, k) in enumerate(nonzero_intensities):
+for i, (j, k) in enumerate(feature_function):
     theta_plot[j, k] = theta[i]
 plt.imshow(theta_plot)
 plt.colorbar(label="Value of θ")
@@ -79,7 +88,7 @@ plt.savefig('theta.png')
 # 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier
 # IN PROGRESS (ALMOST DONE)
 # reconstruct A & y (only theta remains unchanged for testing)
-A1, y1 = construct_A_y(x_test, y_test, nonzero_intensities, image_quantity, feature_quantity)
+A1, y1 = construct_A_y(x_test, y_test, feature_function, image_quantity, feature_quantity)
 
 # calculate f_tilde(x) i.e. least squares classifier
 def calculate_classifier(A_matrix, theta_vector):
@@ -140,14 +149,15 @@ y_train100 = y_train[:100]
 y_test100 = y_test[:100]
 
 image_quantity100 = len(x_train100)
-nonzero_intensities100 = []
-feature_quantity100 = calculate_feature(nonzero_intensities100, pixel_dimensions, 100) # caps @ 100
+nonzero_intensities100 = np.zeros(pixel_dimensions)
+maximum_intensity100 = 12
+feature_quantity100, feature_function100 = calculate_feature(nonzero_intensities100, pixel_dimensions, image_quantity100, maximum_intensity100) # caps @ 100
 
-A100, y100 = construct_A_y(x_train100, y_train100, nonzero_intensities100, image_quantity100, feature_quantity100)
+A100, y100 = construct_A_y(x_train100, y_train100, feature_function100, image_quantity100, feature_quantity100)
 theta100 = np.linalg.lstsq(A100, y100, rcond=None)[0]
 
 theta_plot100 = np.zeros(pixel_dimensions)
-for i, (j, k) in enumerate(nonzero_intensities100):
+for i, (j, k) in enumerate(feature_function100):
     theta_plot100[j, k] = theta100[i]
 plt.figure() # avoid overriding previous figure
 plt.imshow(theta_plot100)
@@ -157,7 +167,7 @@ plt.xlabel("x-coordinate")
 plt.ylabel("y-coordinate")
 plt.savefig('theta100.png')
 
-A1001, y1001 = construct_A_y(x_test100, y_test100, nonzero_intensities100, image_quantity100, feature_quantity100)
+A1001, y1001 = construct_A_y(x_test100, y_test100, feature_function100, image_quantity100, feature_quantity100)
 least_squares_classifier100 = calculate_classifier(A1001, theta100)
 
 error_list100 = calculate_error(least_squares_classifier100, y1001, image_quantity100)
