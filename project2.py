@@ -32,8 +32,6 @@ pixel_dimensions = (28, 28) # 28 x 28 pixels
 nonzero_intensities = np.zeros(pixel_dimensions)
 maximum_intensity = 600
 
-# REDO BRUH
-# correct approach: loop thru all 5k & increment 28 x 28 pixel entries for nonzero intensities;
 # only keep values ≥ 600 as features
 def calculate_feature(intensities, dimensions, image_number, max_intensity):
     for i in range(image_number): # 5000
@@ -86,7 +84,7 @@ plt.savefig('theta.png')
 
 
 # 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier
-# IN PROGRESS (ALMOST DONE)
+# DONE (despite unfathomable error rates)
 # reconstruct A & y (only theta remains unchanged for testing)
 A1, y1 = construct_A_y(x_test, y_test, feature_function, image_quantity, feature_quantity)
 
@@ -142,7 +140,7 @@ print("False Negative Rate: " + false_negative_rate)
 
 
 # 5 TODO: Repeat steps 1-4 w/ only the 1st 100 images
-# IN PROGRESS (gotta finish # 4 first) (bye)
+# DONE
 x_train100 = x_train[:100]
 x_test100 = x_test[:100]
 y_train100 = y_train[:100]
@@ -184,6 +182,7 @@ print("False Negative Rate: " + false_negative_rate100)
 # CONTINUE NEXT (again, gotta finish # 4 first)
 new_feature_quantity = 5000 # M
 # R = 5000 x 609
+
 
 
 # 7 TODO: Calculate error rate, false positive, & false negative rate for the new classifier
