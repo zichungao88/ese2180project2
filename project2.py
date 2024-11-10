@@ -177,7 +177,7 @@ print("False Negative Rate: " + false_negative_rate100)
 
 
 # 6 TODO: Changing the feature set
-# IN PROGRESS
+# DONE
 new_feature_quantity = 5000 # M
 # R = 5000 x 329
 R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
@@ -206,13 +206,83 @@ new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
 
 
 # 7 TODO: Calculate error rate, false positive, & false negative rate for the new classifier
-# IN PROGRESS
+# DONE
 new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
 new_error_rate = format(new_error_list[0], '.0%')
 new_false_positive_rate = format(new_error_list[1], '.0%')
 new_false_negative_rate = format(new_error_list[2], '.0%')
 print("\nNew Features:\n")
 print("For M = 5000:")
+print("Error Rate: " + new_error_rate)
+print("False Positive Rate: " + new_false_positive_rate)
+print("False Negative Rate: " + new_false_negative_rate)
+
+# Repeat for different values of M
+# we will reuse variables this time bc there are already too many to keep track of
+# M = 20
+new_feature_quantity = 20
+R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
+A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
+theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
+A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
+new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
+
+new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
+new_error_rate = format(new_error_list[0], '.0%')
+new_false_positive_rate = format(new_error_list[1], '.0%')
+new_false_negative_rate = format(new_error_list[2], '.0%')
+print("For M = 20:")
+print("Error Rate: " + new_error_rate)
+print("False Positive Rate: " + new_false_positive_rate)
+print("False Negative Rate: " + new_false_negative_rate)
+
+# M = 50
+new_feature_quantity = 50
+R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
+A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
+theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
+A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
+new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
+
+new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
+new_error_rate = format(new_error_list[0], '.0%')
+new_false_positive_rate = format(new_error_list[1], '.0%')
+new_false_negative_rate = format(new_error_list[2], '.0%')
+print("For M = 50:")
+print("Error Rate: " + new_error_rate)
+print("False Positive Rate: " + new_false_positive_rate)
+print("False Negative Rate: " + new_false_negative_rate)
+
+# M = 1000
+new_feature_quantity = 1000
+R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
+A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
+theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
+A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
+new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
+
+new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
+new_error_rate = format(new_error_list[0], '.0%')
+new_false_positive_rate = format(new_error_list[1], '.0%')
+new_false_negative_rate = format(new_error_list[2], '.0%')
+print("For M = 1000:")
+print("Error Rate: " + new_error_rate)
+print("False Positive Rate: " + new_false_positive_rate)
+print("False Negative Rate: " + new_false_negative_rate)
+
+# M = 10000
+new_feature_quantity = 10000
+R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
+A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
+theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
+A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
+new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
+
+new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
+new_error_rate = format(new_error_list[0], '.0%')
+new_false_positive_rate = format(new_error_list[1], '.0%')
+new_false_negative_rate = format(new_error_list[2], '.0%')
+print("For M = 10000:")
 print("Error Rate: " + new_error_rate)
 print("False Positive Rate: " + new_false_positive_rate)
 print("False Negative Rate: " + new_false_negative_rate)
