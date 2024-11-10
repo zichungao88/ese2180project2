@@ -92,10 +92,8 @@ A1, y1 = construct_A_y(x_test, y_test, feature_function, image_quantity, feature
 def calculate_classifier(A_matrix, theta_vector):
     least_squares = np.matmul(A_matrix, theta_vector)
     # print(len(least_squares))
-
     classifier = np.sign(least_squares)
     # print(len(classifier))
-
     return classifier
 
 least_squares_classifier = calculate_classifier(A1, theta)
@@ -181,8 +179,11 @@ print("False Negative Rate: " + false_negative_rate100)
 # 6 TODO: Changing the feature set
 # CONTINUE NEXT (again, gotta finish # 4 first)
 new_feature_quantity = 5000 # M
-# R = 5000 x 609
+# R = 5000 x 329
+R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
+# print(R)
 
+pass
 
 
 # 7 TODO: Calculate error rate, false positive, & false negative rate for the new classifier
