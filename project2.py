@@ -3,7 +3,7 @@ from os.path import join
 import matplotlib.pyplot as plt
 import mnist_data_loader # class from mnist_data_loader.py
 
-# 1 TODO: Download & load MNIST training & testing datsets
+# 1 TODO: Download & load MNIST training & testing datasets
 # DONE
 # set file paths
 input_path = './'
@@ -80,7 +80,7 @@ plt.savefig('theta.png')
 # plt.show()
 
 
-# 4 TODO: Load images & calculate error rate, false positive rate, & false negative rate of classifier
+# 4 TODO: Perform classification & calculate error rate, false positive rate, & false negative rate of classifier
 # DONE
 # reconstruct A & y (only theta remains unchanged for testing)
 A1, y1 = construct_A_y(x_test, y_test, feature_function, image_quantity, feature_quantity)
