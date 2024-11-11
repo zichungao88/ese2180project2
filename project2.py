@@ -1,8 +1,5 @@
 import numpy as np
-import struct
-from array import array
 from os.path import join
-import random
 import matplotlib.pyplot as plt
 import mnist_data_loader # class from mnist_data_loader.py
 
@@ -19,16 +16,16 @@ test_labels_filepath = join(input_path, 't10k-labels-idx1-ubyte')
 mnist_dataloader = mnist_data_loader.mnist_data_loader(training_images_filepath, training_labels_filepath, test_images_filepath, test_labels_filepath)
 (x_train, y_train), (x_test, y_test) = mnist_dataloader.load_data()
 
-x_train = x_train[:5000]
+x_train = x_train[:5000] # slicing
 x_test = x_test[:5000]
 y_train = y_train[:5000]
 y_test = y_test[:5000]
 
 # 2 TODO: Identify row & column indices of pixels with nonzero intensities
 # DONE
-# pixel intensity: black = 0, 255 = white
+# pixel intensity: 0 = black (blank), 255 = white (written)
 image_quantity = len(x_train) # truncated to 5000 out of 60000
-pixel_dimensions = (28, 28) # 28 x 28 pixels
+pixel_dimensions = (28, 28) # 28 x 28 pixels for each image
 nonzero_intensities = np.zeros(pixel_dimensions)
 maximum_intensity = 600
 
@@ -44,7 +41,7 @@ def calculate_feature(intensities, dimensions, image_number, max_intensity):
     feature_functions = []
     for i in range(dimensions[0]): # 28
         for j in range(dimensions[1]): # 28
-            if intensities[i][j] >= max_intensity:
+            if intensities[i][j] >= max_intensity: # ≥ 600
                 feature_quantity += 1
                 feature_functions.append((i, j))
     return feature_quantity, feature_functions
@@ -62,8 +59,8 @@ def construct_A_y(x_data, y_data, feature_functions, N, M):
 
     for i in range(N):
         for j, (k, l) in enumerate(feature_functions):
-            A[i, j] = x_data[i][k][l]
-    return A, y_data
+            A[i, j] = x_data[i][k][l] # A_ij = f_j(x_i)
+    return A, y_data # no modification of y needed
 
 A, y = construct_A_y(x_train, y_train, feature_function, image_quantity, feature_quantity)
 
@@ -146,6 +143,9 @@ y_test100 = y_test[:100]
 
 image_quantity100 = len(x_train100)
 nonzero_intensities100 = np.zeros(pixel_dimensions)
+# choose new threshold of maximum intensity based on ratio from 5000 images
+# i.e. required intensity was 600 for 5000 images, therefore we choose an intensity of 12 for 100 images
+# in order to maintain the same ratio 500/6000 = 12/100
 maximum_intensity100 = 12
 feature_quantity100, feature_function100 = calculate_feature(nonzero_intensities100, pixel_dimensions, image_quantity100, maximum_intensity100) # caps @ 100
 
@@ -179,21 +179,22 @@ print("False Negative Rate: " + false_negative_rate100)
 # 6 TODO: Changing the feature set
 # DONE
 new_feature_quantity = 5000 # M
-# R = 5000 x 329
+# R = 5000 x 329 (M x # of features determined in Step 2)
 R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
 # print(R)
 
 def calculate_new_feature(M, x_data, y_data, features, dimensions, random_matrix):
+    # must retreive actual values from original feature since we only have coordinates but not their intensities
     A = np.zeros((len(x_data), M))
     for i in range(len(x_data)):
         new_features = []
         for j in range(dimensions[0]):
             for k in range(dimensions[1]):
-                if (j + 1, k + 1) in features:
+                if (j + 1, k + 1) in features: # use existing feature coordinates to get feature values
                     new_features.append(x_data[i][j][k])
-        actual_new_features = np.matmul(random_matrix, new_features)
+        actual_new_features = np.matmul(random_matrix, new_features) # R * x_i
         for l in range(len(actual_new_features)):
-            actual_new_features[l] = max(actual_new_features[l], 0)
+            actual_new_features[l] = max(actual_new_features[l], 0) # max(R * x_i, 0)
         A[i] = actual_new_features
     return A, y_data
 
@@ -219,70 +220,26 @@ print("False Negative Rate: " + new_false_negative_rate)
 
 # Repeat for different values of M
 # we will reuse variables this time bc there are already too many to keep track of
-# M = 20
-new_feature_quantity = 20
-R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
-A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
-theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
-A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
-new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
+for i in range(4):
+    if i == 0:
+        new_feature_quantity = 20
+    elif i == 1:
+        new_feature_quantity = 50
+    elif i == 2:
+        new_feature_quantity = 1000
+    else:
+        new_feature_quantity = 10000
+    R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
+    A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
+    theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
+    A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
+    new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
 
-new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
-new_error_rate = format(new_error_list[0], '.0%')
-new_false_positive_rate = format(new_error_list[1], '.0%')
-new_false_negative_rate = format(new_error_list[2], '.0%')
-print("For M = 20:")
-print("Error Rate: " + new_error_rate)
-print("False Positive Rate: " + new_false_positive_rate)
-print("False Negative Rate: " + new_false_negative_rate)
-
-# M = 50
-new_feature_quantity = 50
-R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
-A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
-theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
-A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
-new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
-
-new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
-new_error_rate = format(new_error_list[0], '.0%')
-new_false_positive_rate = format(new_error_list[1], '.0%')
-new_false_negative_rate = format(new_error_list[2], '.0%')
-print("For M = 50:")
-print("Error Rate: " + new_error_rate)
-print("False Positive Rate: " + new_false_positive_rate)
-print("False Negative Rate: " + new_false_negative_rate)
-
-# M = 1000
-new_feature_quantity = 1000
-R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
-A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
-theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
-A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
-new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
-
-new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
-new_error_rate = format(new_error_list[0], '.0%')
-new_false_positive_rate = format(new_error_list[1], '.0%')
-new_false_negative_rate = format(new_error_list[2], '.0%')
-print("For M = 1000:")
-print("Error Rate: " + new_error_rate)
-print("False Positive Rate: " + new_false_positive_rate)
-print("False Negative Rate: " + new_false_negative_rate)
-
-# M = 10000
-new_feature_quantity = 10000
-R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
-A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
-theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
-A_new1, y_new1 = construct_A_y(x_test, y_test, feature_function, image_quantity, new_feature_quantity)
-new_least_squares_classifier = calculate_classifier(A_new1, theta_new)
-
-new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
-new_error_rate = format(new_error_list[0], '.0%')
-new_false_positive_rate = format(new_error_list[1], '.0%')
-new_false_negative_rate = format(new_error_list[2], '.0%')
-print("For M = 10000:")
-print("Error Rate: " + new_error_rate)
-print("False Positive Rate: " + new_false_positive_rate)
-print("False Negative Rate: " + new_false_negative_rate)
+    new_error_list = calculate_error(new_least_squares_classifier, y_new1, image_quantity)
+    new_error_rate = format(new_error_list[0], '.0%')
+    new_false_positive_rate = format(new_error_list[1], '.0%')
+    new_false_negative_rate = format(new_error_list[2], '.0%')
+    print("For M = " + new_feature_quantity + ":")
+    print("Error Rate: " + new_error_rate)
+    print("False Positive Rate: " + new_false_positive_rate)
+    print("False Negative Rate: " + new_false_negative_rate)
