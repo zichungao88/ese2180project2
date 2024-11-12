@@ -222,13 +222,13 @@ print("False Negative Rate: " + new_false_negative_rate)
 # we will reuse variables this time bc there are already too many to keep track of
 for i in range(4):
     if i == 0:
-        new_feature_quantity = 20
+        new_feature_qty = 20
     elif i == 1:
-        new_feature_quantity = 50
+        new_feature_qty = 50
     elif i == 2:
-        new_feature_quantity = 1000
+        new_feature_qty = 1000
     else:
-        new_feature_quantity = 10000
+        new_feature_qty = 10000
     R = np.random.choice([-1, 1], size=(new_feature_quantity, feature_quantity))
     A_new, y_new = calculate_new_feature(new_feature_quantity, x_train, y_train, feature_function, pixel_dimensions, R)
     theta_new = np.linalg.lstsq(A_new, y_new, rcond=None)[0]
@@ -239,7 +239,7 @@ for i in range(4):
     new_error_rate = format(new_error_list[0], '.0%')
     new_false_positive_rate = format(new_error_list[1], '.0%')
     new_false_negative_rate = format(new_error_list[2], '.0%')
-    print("For M = " + new_feature_quantity + ":")
+    print("For M = " + str(new_feature_qty) + ":")
     print("Error Rate: " + new_error_rate)
     print("False Positive Rate: " + new_false_positive_rate)
     print("False Negative Rate: " + new_false_negative_rate)
